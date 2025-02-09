@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habit Tracker</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f3e5ab, #ffb6c1);
+      overflow: auto;
+    }
+    .habit-tracker {
+      width: 95vw;
+      height: 95vh;
+      background: transparent;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      position: relative;
+      border-radius: 15px;
+      font-size: 1.5rem;
+      overflow: auto;
+      transform-origin: center center; /* Ensure zooming happens from the center */
+      transition: transform 0.2s ease; /* Smooth zoom transition */
+    }
+    .header-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      font-size: 1.5rem;
+    }
+    .zoom-controls, .nav-controls {
+      display: flex;
+      gap: 15px;
+    }
+    .add-habit-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      text-align: center;
+    }
+    button {
+      padding: 10px;
+      border: none;
+      background-color: #ff69b4;
+      color: white;
+      cursor: pointer;
+      font-size: 1.5rem;
+      border-radius: 5px;
+    }
+    table {
+      width: 100%;
+      font-size: 1.2rem;
+      overflow-x: auto;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .habit-text input {
+      font-size: 1.2rem;
+      padding: 5px;
+      width: 200px;
+    }
+    .checkbox {
+      transform: scale(1.5);
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: white;
+      border: none;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      position: relative;
+    }
+    .checkbox:checked::before {
+      content: '\2713';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 16px;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <div class="habit-tracker" id="habit-tracker">
+    <div class="header-controls">
+      <div class="zoom-controls">
+        <button onclick="zoomIn()">Zoom In</button>
+        <button onclick="zoomOut()">Zoom Out</button>
+      </div>
+      <h2 id="month-header">Habit Tracker for February 2025</h2>
+      <div class="nav-controls">
+        <button onclick="prevMonth()">◀ Prev</button>
+        <button onclick="nextMonth()">Next ▶</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr id="weekday-row"></tr>
+        <tr id="date-row"></tr>
+      </thead>
+      <tbody id="habit-rows"></tbody>
+    </table>
+    <div class="add-habit-container">
+      <button onclick="addHabit()">+ Add Habit</button>
+    </div>
+  </div>
+  <script>
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const weekdayNames = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+    let currentMonthIndex = 1;
+    const year = 2025;
+    let habits = ["Exercise", "Read", "Meditate", "Drink Water", "Sleep Well"];
+    let zoomLevel = 1; // Initial zoom level
+
+    function getDaysInMonth(month, year) {
+      return new Date(year, month + 1, 0).getDate();
+    }
+
+    function displayHabits() {
+      const monthHeader = document.getElementById('month-header');
+      monthHeader.textContent = `Habit Tracker for ${monthNames[currentMonthIndex]} ${year}`;
+
+      const habitRows = document.getElementById('habit-rows');
+      const daysInMonth = getDaysInMonth(currentMonthIndex, year);
+      const firstDay = new Date(year, currentMonthIndex, 1).getDay();
+
+      const weekdayRow = document.getElementById("weekday-row");
+      const dateRow = document.getElementById("date-row");
+
+      weekdayRow.innerHTML = `<th class="habit-text">Habits</th>`;
+      dateRow.innerHTML = `<th class="habit-text"></th>`;
+
+      for (let i = 0; i < daysInMonth; i++) {
+        const dayIndex = (firstDay + i) % 7;
+        weekdayRow.innerHTML += `<th>${weekdayNames[dayIndex]}</th>`;
+        dateRow.innerHTML += `<th>${i + 1}</th>`;
+      }
+
+      habitRows.innerHTML = '';
+
+      habits.forEach((habit, index) => {
+        let row = `<tr><td class="habit-text"><input type="text" value="${habit}" onchange="updateHabitName(${index}, this.value)"></td>`;
+        for (let i = 1; i <= daysInMonth; i++) {
+          row += `<td><input type="checkbox" class="checkbox"></td>`;
+        }
+        row += '</tr>';
+        habitRows.innerHTML += row;
+      });
+    }
+
+    function prevMonth() {
+      currentMonthIndex = (currentMonthIndex - 1 + 12) % 12;
+      displayHabits();
+    }
+
+    function nextMonth() {
+      currentMonthIndex = (currentMonthIndex + 1) % 12;
+      displayHabits();
+    }
+
+    function addHabit() {
+      habits.push("New Habit");
+      displayHabits();
+    }
+
+    function updateHabitName(index, newHabitName) {
+      habits[index] = newHabitName;
+    }
+
+    // Zoom In Function
+    function zoomIn() {
+      zoomLevel += 0.1; // Increase zoom level by 10%
+      updateZoom();
+    }
+
+    // Zoom Out Function
+    function zoomOut() {
+      zoomLevel -= 0.1; // Decrease zoom level by 10%
+      updateZoom();
+    }
+
+    // Update Zoom Level
+    function updateZoom() {
+      const habitTracker = document.getElementById("habit-tracker");
+      habitTracker.style.transform = `scale(${zoomLevel})`;
+    }
+
+    displayHabits();
+  </script>
+</body>
+</html>

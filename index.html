@@ -18,21 +18,20 @@
       overflow: auto;
     }
     .habit-tracker {
-      width: 95vw;
-      height: 95vh;
-      background: transparent;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      position: relative;
-      border-radius: 15px;
-      font-size: 1.5rem;
-      overflow: auto;
-      transform-origin: center center; /* Ensure zooming happens from the center */
-      transition: transform 0.2s ease; /* Smooth zoom transition */
-    }
+  width: 100vw; /* Make it span the full viewport width */
+  height: 95vh; /* Maintain the height */
+  background: transparent;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  border-radius: 15px;
+  font-size: 1.5rem;
+  overflow: auto;
+}
+
     .header-controls {
       display: flex;
       align-items: center;
@@ -46,7 +45,7 @@
     }
     .add-habit-container {
       position: absolute;
-      bottom: 20px;
+      bottom: 48px;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;

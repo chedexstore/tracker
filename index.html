@@ -18,20 +18,19 @@
       overflow: auto;
     }
     .habit-tracker {
-  width: 100vw; /* Make it span the full viewport width */
-  height: 95vh; /* Maintain the height */
-  background: transparent;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  position: relative;
-  border-radius: 15px;
-  font-size: 1.5rem;
-  overflow: auto;
-}
-
+      width: 100vw; /* Make it span the full viewport width */
+      height: 95vh; /* Maintain the height */
+      background: transparent;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      position: relative;
+      border-radius: 15px;
+      font-size: 1.5rem;
+      overflow: auto;
+    }
     .header-controls {
       display: flex;
       align-items: center;
@@ -126,7 +125,7 @@
     const weekdayNames = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
     let currentMonthIndex = 1;
     const year = 2025;
-    let habits = ["Exercise", "Read", "Meditate", "Drink Water", "Sleep Well"];
+    let habits = JSON.parse(localStorage.getItem('habits')) || ["Exercise", "Read", "Meditate", "Drink Water", "Sleep Well"];
     let zoomLevel = 1; // Initial zoom level
 
     function getDaysInMonth(month, year) {
@@ -158,7 +157,8 @@
       habits.forEach((habit, index) => {
         let row = `<tr><td class="habit-text"><input type="text" value="${habit}" onchange="updateHabitName(${index}, this.value)"></td>`;
         for (let i = 1; i <= daysInMonth; i++) {
-          row += `<td><input type="checkbox" class="checkbox"></td>`;
+          const isChecked = localStorage.getItem(`habit-${index}-day-${i}`) === 'true';
+          row += `<td><input type="checkbox" class="checkbox" ${isChecked ? 'checked' : ''} onchange="updateCheckbox(${index}, ${i}, this.checked)"></td>`;
         }
         row += '</tr>';
         habitRows.innerHTML += row;
@@ -177,11 +177,17 @@
 
     function addHabit() {
       habits.push("New Habit");
+      localStorage.setItem('habits', JSON.stringify(habits));
       displayHabits();
     }
 
     function updateHabitName(index, newHabitName) {
       habits[index] = newHabitName;
+      localStorage.setItem('habits', JSON.stringify(habits));
+    }
+
+    function updateCheckbox(habitIndex, dayIndex, isChecked) {
+      localStorage.setItem(`habit-${habitIndex}-day-${dayIndex}`, isChecked);
     }
 
     // Zoom In Function
